@@ -56,6 +56,7 @@ def get_form_value(form, key):
 
 def run_action(action, issue_key, domain):
     from shared.agents.workflow_agent import (
+        commit_responsible_architect_fix,
         create_solution_design_pr,
         generate_design_package,
         publish_solution_design,
@@ -81,6 +82,10 @@ def run_action(action, issue_key, domain):
 
     if action == "publish":
         result = publish_solution_design(issue_key, domain)
+        return result["message"], result["domain"]
+
+    if action == "commit_fix":
+        result = commit_responsible_architect_fix(issue_key, domain)
         return result["message"], result["domain"]
 
     raise ValueError("Unknown action")
@@ -198,6 +203,7 @@ def render_html(issue_key, domain, message, is_error):
           <button name="action" value="generate_package">Generate Design Package</button>
           <button name="action" value="peer_review">Run Peer Review</button>
           <button name="action" value="create_pr">Create PR</button>
+          <button name="action" value="commit_fix" class="secondary">Commit Architect Fix</button>
           <button name="action" value="publish" class="warning">Publish</button>
         </div>
       </form>
@@ -210,6 +216,7 @@ def render_html(issue_key, domain, message, is_error):
         <li>Generate design package: C1-C4, solution design, peer review.</li>
         <li>Create PR for human review.</li>
         <li>Responsible architect resolves PR comments.</li>
+        <li>Commit architect-owned fixes to the same PR branch.</li>
         <li>Publish only after approval.</li>
       </ol>
     </section>
