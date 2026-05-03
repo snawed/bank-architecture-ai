@@ -1,10 +1,7 @@
 graph TD
-    Customer-->MobileApp
-    MobileApp-->OnboardingSystem
-    OnboardingSystem-->KYCProvider
-    KYCProvider-->AMLSystem
-    AMLSystem-->CoreBanking
-    WebApp-->OnboardingSystem
-    OnboardingSystem-->DocumentManagementService
-    OnboardingSystem-->NotificationService
-    OnboardingSystem-->Audit&LoggingService
+    Customer-->OnboardingSystem[Onboarding System]
+    MobileApp-->OnboardingSystem[Onboarding System]
+    WebApp-->OnboardingSystem[Onboarding System]
+    KYCProvider-->OnboardingSystem[Onboarding System]
+    AMLSystem-->OnboardingSystem[Onboarding System]
+    CoreBanking-->OnboardingSystem[Onboarding System]
