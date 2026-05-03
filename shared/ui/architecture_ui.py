@@ -55,59 +55,33 @@ def get_form_value(form, key):
 
 
 def run_action(action, issue_key, domain):
-    from shared.agents.jira_agent import extract_domain, get_issue
+    from shared.agents.workflow_agent import (
+        create_solution_design_pr,
+        generate_design_package,
+        publish_solution_design,
+        resolve_domain,
+        run_peer_review,
+    )
 
     if action == "resolve_domain":
-        issue = get_issue(issue_key)
-        resolved_domain = extract_domain(issue.fields.summary)
+        issue, resolved_domain = resolve_domain(issue_key)
         return f"Resolved {issue.key}: {issue.fields.summary}", resolved_domain
 
     if action == "generate_package":
-        from shared.agents.architecture_agent import run_all_diagrams
-        from shared.agents.design_document_agent import generate_solution_design
-        from shared.agents.peer_review_agent import generate_peer_review
-
-        issue = get_issue(issue_key)
-        resolved_domain = domain or extract_domain(issue.fields.summary)
-        run_all_diagrams(resolved_domain)
-        generate_solution_design(resolved_domain, issue.key)
-        generate_peer_review(resolved_domain, issue.key)
-        return f"Generated solution design package and peer review for {issue.key} / {resolved_domain}.", resolved_domain
+        result = generate_design_package(issue_key, domain)
+        return result["message"], result["domain"]
 
     if action == "peer_review":
-        from shared.agents.peer_review_agent import generate_peer_review
-
-        issue = get_issue(issue_key)
-        resolved_domain = domain or extract_domain(issue.fields.summary)
-        generate_peer_review(resolved_domain, issue.key)
-        return f"Generated peer review for {issue.key} / {resolved_domain}.", resolved_domain
+        result = run_peer_review(issue_key, domain)
+        return result["message"], result["domain"]
 
     if action == "create_pr":
-        from shared.agents.github_agent import create_branch, commit_changes, create_pr, push_branch
-
-        issue = get_issue(issue_key)
-        resolved_domain = domain or extract_domain(issue.fields.summary)
-        branch_name = f"{resolved_domain.lower()}-solution-design-{issue.key.lower()}"
-        create_branch(branch_name)
-        commit_changes(f"{issue.key}: AI generated solution design package")
-        push_branch(branch_name)
-        pr_url = create_pr(
-            f"{issue.key} - {resolved_domain} Solution Design",
-            (
-                "AI generated solution design with C1-C4 diagrams and peer review.\n\n"
-                "Responsible architect owns resolution of peer review and human reviewer comments before publication."
-            ),
-            branch_name,
-        )
-        return f"Created PR: {pr_url}", resolved_domain
+        result = create_solution_design_pr(issue_key, domain)
+        return result["message"], result["domain"]
 
     if action == "publish":
-        from shared.agents.publish_agent import publish
-
-        issue = get_issue(issue_key)
-        resolved_domain = domain or extract_domain(issue.fields.summary)
-        publish(issue, resolved_domain)
-        return f"Published solution design and diagrams for {issue.key} / {resolved_domain}.", resolved_domain
+        result = publish_solution_design(issue_key, domain)
+        return result["message"], result["domain"]
 
     raise ValueError("Unknown action")
 
