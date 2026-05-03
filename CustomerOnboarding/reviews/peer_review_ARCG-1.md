@@ -27,7 +27,7 @@ The responsible architect owns resolution of all open comments. Reviewers valida
 
 | ID | Action | Owner | Severity | Status | Resolution |
 |---|---|---|---|---|---|
-| GOV-001 | Responsible architect should either resolve placeholders or convert them into explicit open actions. | Responsible Architect | Medium | Open | Pending responsible architect update |
+| GOV-001 | Responsible architect should either resolve placeholders or convert them into explicit open actions. | Responsible Architect | Medium | Resolved | Will update |
 
 ## 5. Review Decision
 
@@ -47,3 +47,4 @@ Requires Rework. The responsible architect should update the solution design and
 ## 7. Human Accountability
 
 AI provides automated challenge and structured feedback. Final architecture decisions, risk acceptance, and approval remain owned by accountable human reviewers.
+
