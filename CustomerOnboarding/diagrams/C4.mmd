@@ -1,0 +1,15 @@
+graph TD
+    A[Customer] -->|Onboards| B[Onboarding Service]
+    B -->|Registers User| C[User Registration Handler]
+    C -->|Verifies Identity| D[Identity Verification Service]
+    D -->|Gets KYC AML Check| E[KYC AML Screening Service]
+    E -->|Validates Documents| F[Document Management Service]
+    F -->|Creates Account| G[Core Banking System]
+    G -->|Notifies Customer| H[Notification Service]
+    H -->|Logs Audit| I[Audit and Logging Service]
+    A -->|Uses| J[Identity Provider]
+    J -->|Provides KYC AML Check| E
+    E -->|Uses| K[AML KYC Vendors]
+    K -->|Provides AML KYC Result| E
+    B -->|Deploys Onboarding Data| L[Data Storage]
+    L -->|Retrieves Onboarding Data| B

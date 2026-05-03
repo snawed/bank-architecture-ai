@@ -1,0 +1,9 @@
+graph TD
+    DomainApi[Domain API] --> Controller[Request Controller]
+    Controller --> ApplicationService[Application Service]
+    ApplicationService --> Validator[Business Validator]
+    ApplicationService --> WorkflowEngine[Workflow Engine]
+    WorkflowEngine --> Repository[Repository]
+    WorkflowEngine --> IntegrationClient[Integration Client]
+    Repository --> DomainDatabase[(Domain Database)]
+    IntegrationClient --> ExternalSystems[External Systems]
