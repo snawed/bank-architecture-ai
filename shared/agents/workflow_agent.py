@@ -11,6 +11,8 @@ from shared.agents.github_agent import (
 from shared.agents.jira_agent import extract_domain, get_issue
 from shared.agents.peer_review_agent import generate_peer_review, get_peer_review_path
 from shared.agents.publish_agent import publish
+from shared.agents.github_agent import push_branch
+import subprocess
 
 
 def resolve_domain(issue_key):
@@ -85,7 +87,69 @@ def publish_solution_design(issue_key, domain=None):
     }
 
 
+def commit_responsible_architect_fix(issue_key, domain=None):
+    issue, resolved_domain = resolve_issue_and_domain(issue_key, domain)
+    paths = [
+        f"{resolved_domain}/docs/solution_design.md",
+        f"{resolved_domain}/reviews/peer_review_{issue.key.upper()}.md",
+        f"{resolved_domain}/diagrams/C1.mmd",
+        f"{resolved_domain}/diagrams/C1.svg",
+        f"{resolved_domain}/diagrams/C2.mmd",
+        f"{resolved_domain}/diagrams/C2.svg",
+        f"{resolved_domain}/diagrams/C3.mmd",
+        f"{resolved_domain}/diagrams/C3.svg",
+        f"{resolved_domain}/diagrams/C4.mmd",
+        f"{resolved_domain}/diagrams/C4.svg",
+    ]
+
+    existing_paths = [path for path in paths if path_exists(path)]
+
+    if not existing_paths:
+        raise FileNotFoundError("No solution design or review artifacts found to commit")
+
+    subprocess.run(["git", "add", *existing_paths], check=True)
+
+    has_changes = subprocess.run(
+        ["git", "diff", "--cached", "--quiet"],
+        capture_output=True,
+    ).returncode != 0
+
+    if not has_changes:
+        return {
+            "issue": issue,
+            "domain": resolved_domain,
+            "message": "No responsible architect changes found to commit.",
+        }
+
+    subprocess.run(
+        ["git", "commit", "-m", f"{issue.key}: resolve responsible architect review comments"],
+        check=True,
+    )
+    push_branch(current_branch())
+
+    return {
+        "issue": issue,
+        "domain": resolved_domain,
+        "message": f"Committed and pushed responsible architect fixes for {issue.key} / {resolved_domain}.",
+    }
+
+
 def resolve_issue_and_domain(issue_key, domain=None):
     issue = get_issue(issue_key)
     resolved_domain = domain or extract_domain(issue.fields.summary)
     return issue, resolved_domain
+
+
+def path_exists(path):
+    from pathlib import Path
+
+    return Path(path).exists()
+
+
+def current_branch():
+    return subprocess.run(
+        ["git", "branch", "--show-current"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
