@@ -11,7 +11,7 @@ fi
 
 echo "Running C1 generation for $DOMAIN"
 
-"$PYTHON_BIN" shared/scripts/generate_c1.py "$DOMAIN"
+"$PYTHON_BIN" shared/scripts/generate_diagram.py "$DOMAIN" "C1"
 
 mmdc -i "$DOMAIN/diagrams/C1.mmd" \
      -o "$DOMAIN/diagrams/C1.svg"
